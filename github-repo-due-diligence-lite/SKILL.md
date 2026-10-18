@@ -20,8 +20,8 @@ One GET to `api.github.com/repos/<owner>/<repo>` — public, unauthenticated (60
 Requires Node 18+, zero dependencies.
 
 ```bash
-node <skill-dir>/scripts/dd.mjs owner/repo
-node <skill-dir>/scripts/dd.mjs https://github.com/owner/repo
+node <skill-dir>/scripts/dd.js owner/repo
+node <skill-dir>/scripts/dd.js https://github.com/owner/repo
 ```
 
 JSON on stdout; exit `1` on fetch failure, `2` on bad argument.

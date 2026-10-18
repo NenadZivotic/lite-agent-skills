@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { summarize } from "../scripts/dd.mjs";
+import { summarize } from "../scripts/dd.js";
 
 const fixture = (over = {}) => ({
   stargazers_count: 100,

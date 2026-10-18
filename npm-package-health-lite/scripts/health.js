@@ -34,10 +34,10 @@ export function summarize(pkg, d) {
   };
 }
 
-if (process.argv[1]?.endsWith("health.mjs")) {
+if (process.argv[1]?.endsWith("health.js")) {
   const pkg = process.argv[2];
   if (!pkg) {
-    console.error("usage: node health.mjs <package-name>");
+    console.error("usage: node health.js <package-name>");
     process.exit(2);
   }
   try {

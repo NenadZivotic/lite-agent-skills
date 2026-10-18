@@ -77,10 +77,10 @@ export function build(text) {
   return { variables, format, wordCount, warnings, template };
 }
 
-if (process.argv[1]?.endsWith("generate.mjs")) {
+if (process.argv[1]?.endsWith("generate.js")) {
   const arg = process.argv[2];
   if (!arg) {
-    console.error("usage: node generate.mjs <description.txt | ->");
+    console.error("usage: node generate.js <description.txt | ->");
     process.exit(2);
   }
   let text;

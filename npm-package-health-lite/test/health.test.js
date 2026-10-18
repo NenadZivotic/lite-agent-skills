@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { summarize } from "../scripts/health.mjs";
+import { summarize } from "../scripts/health.js";
 
 const fixture = (over = {}) => ({
   "dist-tags": { latest: "1.0.0" },

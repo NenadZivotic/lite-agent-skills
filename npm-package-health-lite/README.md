@@ -11,7 +11,7 @@ npx skills add NenadZivotic/lite-agent-skills --skill npm-package-health-lite
 ## Run
 
 ```bash
-node scripts/health.mjs lodash
+node scripts/health.js lodash
 ```
 
 ## Full version

@@ -5,7 +5,7 @@ description: Offline on-page SEO audit of a local HTML file — title and meta d
 
 # SEO Quick Audit (Lite)
 
-Runs `scripts/audit.mjs` on a **local HTML file** the user supplies and reports pass/warn/fail on core on-page SEO checks. Completely offline — the script reads one file and emits JSON.
+Runs `scripts/audit.js` on a **local HTML file** the user supplies and reports pass/warn/fail on core on-page SEO checks. Completely offline — the script reads one file and emits JSON.
 
 ## Scope and rules
 
@@ -18,7 +18,7 @@ Runs `scripts/audit.mjs` on a **local HTML file** the user supplies and reports 
 Requires Node 18+, zero dependencies.
 
 ```bash
-node <skill-dir>/scripts/audit.mjs page.html
+node <skill-dir>/scripts/audit.js page.html
 ```
 
 JSON on stdout; exit `1` when any warn/fail is present (CI-gateable), `2` on read/usage error.

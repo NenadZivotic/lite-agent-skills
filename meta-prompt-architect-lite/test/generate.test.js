@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { build, extractVariables } from "../scripts/generate.mjs";
+import { build, extractVariables } from "../scripts/generate.js";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(DIR, "..");
@@ -30,7 +30,7 @@ test("quoted phrases become variables", () => {
 
 test("cli stdin mode works, exit 0 or 1 with json", () => {
   try {
-    const out = execFileSync("node", ["scripts/generate.mjs", "-"], { cwd: ROOT, input: DESC, encoding: "utf8" });
+    const out = execFileSync("node", ["scripts/generate.js", "-"], { cwd: ROOT, input: DESC, encoding: "utf8" });
     const j = JSON.parse(out);
     assert.ok(j.template);
   } catch (e) {

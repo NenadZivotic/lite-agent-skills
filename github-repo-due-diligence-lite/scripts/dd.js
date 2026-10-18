@@ -29,11 +29,11 @@ export function summarize(owner, repo, d) {
   };
 }
 
-if (process.argv[1]?.endsWith("dd.mjs")) {
+if (process.argv[1]?.endsWith("dd.js")) {
   const arg = process.argv[2];
   const m = arg?.match(/(?:github\.com\/)?([^/]+)\/([^/]+)/);
   if (!m) {
-    console.error("usage: node dd.mjs owner/repo  |  node dd.mjs https://github.com/o/r");
+    console.error("usage: node dd.js owner/repo  |  node dd.js https://github.com/o/r");
     process.exit(2);
   }
   const [owner, repo] = [m[1], m[2].replace(/\.git$/, "")];

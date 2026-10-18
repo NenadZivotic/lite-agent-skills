@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { build } from "../scripts/sequence.mjs";
+import { build } from "../scripts/sequence.js";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(DIR, "..");
@@ -38,7 +38,7 @@ test("no painPoints → placeholders + warning", () => {
 
 test("cli stdin: valid json prints report", () => {
   try {
-    const out = execFileSync("node", ["scripts/sequence.mjs", "-"], { cwd: ROOT, input: JSON.stringify(BRIEF), encoding: "utf8" });
+    const out = execFileSync("node", ["scripts/sequence.js", "-"], { cwd: ROOT, input: JSON.stringify(BRIEF), encoding: "utf8" });
     assert.equal(JSON.parse(out).sequence.length, 2);
   } catch (e) {
     assert.equal(e.status, 1); // warnings ok

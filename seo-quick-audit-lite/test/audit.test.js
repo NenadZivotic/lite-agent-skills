@@ -5,7 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { auditHtml } from "../scripts/audit.mjs";
+import { auditHtml } from "../scripts/audit.js";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(DIR, "..");
@@ -39,7 +39,7 @@ test("cli: exit 1 on warn/fail, json on stdout", () => {
   const f = path.join(os.tmpdir(), `seo-${Date.now()}.html`);
   fs.writeFileSync(f, BAD);
   try {
-    execFileSync("node", ["scripts/audit.mjs", f], {
+    execFileSync("node", ["scripts/audit.js", f], {
       cwd: ROOT,
       encoding: "utf8",
     });
@@ -55,7 +55,7 @@ test("cli: exit 1 on warn/fail, json on stdout", () => {
 
 test("cli: exit 2 on missing file", () => {
   try {
-    execFileSync("node", ["scripts/audit.mjs", "nope.html"], {
+    execFileSync("node", ["scripts/audit.js", "nope.html"], {
       cwd: ROOT,
       encoding: "utf8",
       stdio: "pipe",

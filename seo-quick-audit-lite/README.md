@@ -13,7 +13,7 @@ Or clone and point your agent at `seo-quick-audit-lite/SKILL.md`.
 ## Run
 
 ```bash
-node scripts/audit.mjs page.html
+node scripts/audit.js page.html
 ```
 
 JSON report on stdout; exit `1` on warn/fail (CI-gateable).

@@ -69,10 +69,10 @@ export function build(input) {
   return { input_echo: { icp: input.icp || null, product: input.product || null }, sequence, checks, warnings };
 }
 
-if (process.argv[1]?.endsWith("sequence.mjs")) {
+if (process.argv[1]?.endsWith("sequence.js")) {
   const arg = process.argv[2];
   if (!arg) {
-    console.error("usage: node sequence.mjs <brief.json | ->");
+    console.error("usage: node sequence.js <brief.json | ->");
     process.exit(2);
   }
   let raw;

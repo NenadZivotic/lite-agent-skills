@@ -11,7 +11,7 @@ npx skills add NenadZivotic/lite-agent-skills --skill github-repo-due-diligence-
 ## Run
 
 ```bash
-node scripts/dd.mjs owner/repo
+node scripts/dd.js owner/repo
 ```
 
 ## Full version

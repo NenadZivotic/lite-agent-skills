@@ -5,7 +5,7 @@ description: Generate a minimal 2-touch cold outreach skeleton (opener + polite 
 
 # Cold Email Sequence (Lite)
 
-`scripts/sequence.mjs` turns a structured brief into a 2-touch skeleton (day 0 opener, day 7 breakup). You write the final copy — skeletons encode structure, not finished prose.
+`scripts/sequence.js` turns a structured brief into a 2-touch skeleton (day 0 opener, day 7 breakup). You write the final copy — skeletons encode structure, not finished prose.
 
 ## Rules
 
@@ -19,7 +19,7 @@ description: Generate a minimal 2-touch cold outreach skeleton (opener + polite 
 Requires Node 18+, zero dependencies. Fully offline.
 
 ```bash
-node <skill-dir>/scripts/sequence.mjs brief.json
+node <skill-dir>/scripts/sequence.js brief.json
 ```
 
 Brief: `{product, icp, painPoints[], cta, senderName, company}` — `product` and `icp` required. Exit `1` when required fields are missing or warnings exist.

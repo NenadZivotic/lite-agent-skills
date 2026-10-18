@@ -65,10 +65,10 @@ export function auditHtml(html) {
 }
 
 const isMain = process.argv[1] && import.meta.url === new URL(`file:///${process.argv[1].replace(/\\/g, "/")}`).href;
-if (isMain || process.argv[1]?.endsWith("audit.mjs")) {
+if (isMain || process.argv[1]?.endsWith("audit.js")) {
   const file = process.argv[2];
   if (!file) {
-    console.error("usage: node audit.mjs <page.html>");
+    console.error("usage: node audit.js <page.html>");
     process.exit(2);
   }
   let html;

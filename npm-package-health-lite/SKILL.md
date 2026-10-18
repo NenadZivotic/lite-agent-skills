@@ -19,7 +19,7 @@ One GET to `registry.npmjs.org/<package>` — public registry metadata. No other
 Requires Node 18+, zero dependencies.
 
 ```bash
-node <skill-dir>/scripts/health.mjs <package-name>
+node <skill-dir>/scripts/health.js <package-name>
 ```
 
 JSON on stdout; exit `1` on fetch failure, `2` on missing argument.

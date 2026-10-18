@@ -23,5 +23,5 @@ Also free: [secret-leak-scan-lite](https://github.com/NenadZivotic/secret-leak-s
 ## Test
 
 ```bash
-cd <skill> && node --test test/*.test.mjs
+cd <skill> && node --test test/*.test.js
 ```

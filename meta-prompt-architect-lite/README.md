@@ -11,8 +11,8 @@ npx skills add NenadZivotic/lite-agent-skills --skill meta-prompt-architect-lite
 ## Run
 
 ```bash
-node scripts/generate.mjs task.txt
-echo "Summarize each meeting transcript into markdown for managers" | node scripts/generate.mjs -
+node scripts/generate.js task.txt
+echo "Summarize each meeting transcript into markdown for managers" | node scripts/generate.js -
 ```
 
 ## Full version

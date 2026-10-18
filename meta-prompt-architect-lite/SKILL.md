@@ -5,7 +5,7 @@ description: Turn a plain-language task description into a minimal prompt templa
 
 # Meta-Prompt Architect (Lite)
 
-`scripts/generate.mjs` deterministically extracts structure from a task description; **you** refine wording and variable names. The script never invents requirements — it surfaces what's missing.
+`scripts/generate.js` deterministically extracts structure from a task description; **you** refine wording and variable names. The script never invents requirements — it surfaces what's missing.
 
 ## Rules
 
@@ -19,8 +19,8 @@ description: Turn a plain-language task description into a minimal prompt templa
 Requires Node 18+, zero dependencies. Fully offline.
 
 ```bash
-node <skill-dir>/scripts/generate.mjs task.txt
-echo "..." | node <skill-dir>/scripts/generate.mjs -
+node <skill-dir>/scripts/generate.js task.txt
+echo "..." | node <skill-dir>/scripts/generate.js -
 ```
 
 JSON on stdout; exit `1` when warnings exist, `2` on read/usage error.

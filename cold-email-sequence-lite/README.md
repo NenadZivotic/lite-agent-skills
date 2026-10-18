@@ -11,7 +11,7 @@ npx skills add NenadZivotic/lite-agent-skills --skill cold-email-sequence-lite
 ## Run
 
 ```bash
-echo '{"product":"ACME scheduler","icp":"clinic managers","painPoints":["no-show appointments"],"cta":"worth a quick look?","senderName":"N","company":"ACME"}' | node scripts/sequence.mjs -
+echo '{"product":"ACME scheduler","icp":"clinic managers","painPoints":["no-show appointments"],"cta":"worth a quick look?","senderName":"N","company":"ACME"}' | node scripts/sequence.js -
 ```
 
 ## Full version

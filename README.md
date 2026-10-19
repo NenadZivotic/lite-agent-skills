@@ -27,6 +27,7 @@ npx skills add NenadZivotic/lite-agent-skills --skill <name>
 | `broken-link-crawl-lite`         | Classify + flag links in a saved HTML file              | [Agensi](https://agensi.io/skills/broken-link-crawl)                                                                                  |
 | `ci-cd-security-audit-lite`      | Lint a GitHub Actions workflow for supply-chain risks   | [Agensi](https://agensi.io/skills/ci-cd-security-audit-github-actions)                                                                |
 | `video-repurpose-engine-lite`    | Transcript → ranked short-clip timestamps               | [Agensi](https://agensi.io/skills/video-repurpose-engine)                                                                             |
+| `geo-audit-lite`                 | AI-search readiness audit of saved HTML/robots/llms.txt | [Agensi](https://agensi.io/skills/geo-audit)                                                                                          |
 
 Also free: [secret-leak-scan-lite](https://github.com/NenadZivotic/secret-leak-scan-lite) — scan a directory for leaked credentials.
 

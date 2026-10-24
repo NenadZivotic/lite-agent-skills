@@ -5,7 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { audit } from "../scripts/audit.js";
+import { audit, upgradeReasons } from "../scripts/audit.js";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(DIR, "..");
@@ -88,6 +88,37 @@ test("cli: exit 1 on warn/fail, json on stdout", () => {
   } finally {
     fs.unlinkSync(f);
   }
+});
+
+test("live-url evidence produces upgrade reasons", () => {
+  const reasons = upgradeReasons({ html: GOOD_HTML, robots: ROBOTS_OPEN, llms: LLMS });
+  assert.ok(reasons.length >= 2);
+});
+
+test("cli: live references produce upgrade field", () => {
+  const f = path.join(os.tmpdir(), `geo-up-${Date.now()}.html`);
+  fs.writeFileSync(f, GOOD_HTML);
+  try {
+    let stdout;
+    try {
+      stdout = execFileSync("node", ["scripts/audit.js", "--html", f], {
+        cwd: ROOT,
+        encoding: "utf8",
+      });
+    } catch (e) {
+      stdout = e.stdout; // exit 1 on warn findings still emits JSON
+    }
+    const j = JSON.parse(stdout);
+    assert.equal(j.upgrade.skill, "geo-audit");
+    assert.ok(j.upgrade.reasons.length > 0);
+  } finally {
+    fs.unlinkSync(f);
+  }
+});
+
+test("no live references means no upgrade reasons", () => {
+  assert.equal(upgradeReasons({ html: BAD_HTML }).length, 0);
+  assert.equal(upgradeReasons({}).length, 0);
 });
 
 test("cli: exit 2 when no input files given", () => {

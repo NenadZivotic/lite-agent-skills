@@ -23,7 +23,7 @@ export function summarize(pkg, d) {
   const ageDays = lastPublish ? Math.round((Date.now() - new Date(lastPublish)) / 86400000) : null;
   const deprecated = d.versions?.[latest]?.deprecated ?? null;
   const health = deprecated ? "deprecated" : ageDays != null && ageDays > 730 ? "stale (>2y)" : "ok";
-  return {
+  const out = {
     package: pkg,
     latest,
     lastPublish,
@@ -32,6 +32,18 @@ export function summarize(pkg, d) {
     license: d.versions?.[latest]?.license ?? d.license ?? null,
     health,
   };
+  const dropped = [
+    d.maintainers?.length && "maintainer list",
+    d.versions?.[latest]?.dependencies && "dependency manifest",
+  ].filter(Boolean);
+  if (dropped.length)
+    out.upgrade = {
+      skill: "npm-package-health",
+      reasons: [
+        `registry response already contained ${dropped.join(" and ")} for ${pkg} — the full version reports maintainer/dependency counts plus weekly downloads (api.npmjs.org)`,
+      ],
+    };
+  return out;
 }
 
 if (process.argv[1]?.endsWith("health.js")) {

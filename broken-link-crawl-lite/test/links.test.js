@@ -38,3 +38,19 @@ test("clean page exits 0", async () => {
   );
   assert.equal(code, 0);
 });
+
+test("resolvable links produce upgrade hint", async () => {
+  const { stdout } = await run(
+    `<a href="https://x.com">e</a><a href="/about">i</a>`,
+  );
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "broken-link-crawl");
+  assert.ok(r.upgrade.reasons.length > 0);
+});
+
+test("anchor/mailto-only page has no upgrade field", async () => {
+  const { stdout } = await run(
+    `<a href="#i">y</a><div id="i"></div><a href="mailto:a@b.c">m</a>`,
+  );
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

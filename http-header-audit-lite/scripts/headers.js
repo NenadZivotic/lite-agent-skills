@@ -56,12 +56,24 @@ function main() {
   } else checks.push({ id: "cookie-flags", status: "info", detail: "no Set-Cookie in response" });
 
   const bad = checks.filter((c) => c.status !== "pass" && c.status !== "info").length;
-  console.log(JSON.stringify({
+
+  const reasons = [];
+  if (/^HTTP\/[\d.]+\s+3\d\d\b/im.test(text) || h.has("location"))
+    reasons.push("response carries a redirect — the full version follows the chain and audits each hop");
+  const corsHeaders = [...h.keys()].filter((k) => k.startsWith("access-control-"));
+  if (corsHeaders.length)
+    reasons.push(`${corsHeaders.length} Access-Control-* header(s) present — CORS analysis is only in the full version`);
+  if (h.has("expect-ct") || h.has("cache-control"))
+    reasons.push("Expect-CT/Cache-Control header(s) present — the full version reviews them");
+
+  const report = {
     tool: "http-header-audit-lite",
     summary: { pass: checks.filter((c) => c.status === "pass").length, warn: checks.filter((c) => c.status === "warn").length, fail: checks.filter((c) => c.status === "fail").length },
     checks,
     headersSeen: [...h.keys()],
-  }, null, 2));
+  };
+  if (reasons.length) report.upgrade = { skill: "http-header-audit", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(bad ? 1 : 0);
 }
 main();

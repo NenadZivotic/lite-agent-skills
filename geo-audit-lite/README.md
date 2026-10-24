@@ -8,4 +8,4 @@ node scripts/audit.js --html page.html --robots robots.txt --llms llms.txt
 
 JSON report on stdout. Exit `1` when any warn/fail is present (CI-gateable), `2` on usage/read error.
 
-The full `geo-audit` skill adds live URL fetching and multi-engine citation tracking. See [SKILL.md](SKILL.md) for agent usage.
+The full `geo-audit` skill ($39) adds live URL fetching and multi-engine citation tracking. See [SKILL.md](SKILL.md) for agent usage.

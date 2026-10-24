@@ -46,3 +46,27 @@ test("usage error exits 2", async () => {
   const { code } = await run([]);
   assert.equal(code, 2);
 });
+
+test("git repo with >1 commit produces upgrade hint", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "leak-repo-"));
+  await fs.mkdir(path.join(dir, ".git", "logs"), { recursive: true });
+  const reflog = (sha) => `${"0".repeat(40)} ${sha} A <a@b.c> 1700000000 +0000\tcommit: x\n`;
+  await fs.writeFile(
+    path.join(dir, ".git", "logs", "HEAD"),
+    reflog("a".repeat(40)) + reflog("b".repeat(40)),
+  );
+  const f = path.join(dir, "patch.diff");
+  await fs.writeFile(f, DIFF);
+  const { stdout } = await run([f]);
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "git-history-leak-check");
+  assert.ok(r.upgrade.reasons.length > 0);
+});
+
+test("patch outside a git repo has no upgrade field", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "leak-norepo-"));
+  const f = path.join(dir, "patch.diff");
+  await fs.writeFile(f, DIFF);
+  const { stdout } = await run([f]);
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

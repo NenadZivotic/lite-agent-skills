@@ -42,6 +42,21 @@ test("missing payment detected", () => {
   assert.ok(r.missing.some((m) => m.category === "payment"));
 });
 
+test("full-only categories produce upgrade hint", () => {
+  const r = analyze(`1. TERMINATION
+Either party may terminate this agreement with 30 days written notice.
+
+2. CONFIDENTIALITY
+All shared information is confidential and subject to non-disclosure.
+`);
+  assert.equal(r.upgrade.skill, "contract-triage-nda-msa-risk-check-before-you-sign");
+  assert.ok(r.upgrade.reasons.length > 0);
+});
+
+test("4-category-only contract has no upgrade field", () => {
+  assert.equal(analyze(CLEAN).upgrade, undefined);
+});
+
 test("cli: exit 1 on flags", () => {
   try {
     execFileSync("node", ["scripts/clauses.js", "-"], {

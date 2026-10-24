@@ -39,3 +39,15 @@ test("null origin warns", async () => {
   const r = JSON.parse(stdout);
   assert.ok(r.findings.some((f) => f.id === "null-origin-accepted"));
 });
+
+test("specific ACAO origin produces upgrade hint", async () => {
+  const { stdout } = await run("Access-Control-Allow-Origin: https://app.example\nVary: Origin\n");
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "cors-misconfig-check");
+  assert.ok(r.upgrade.reasons.length > 0);
+});
+
+test("wildcard-only headers have no upgrade field", async () => {
+  const { stdout } = await run("Access-Control-Allow-Origin: *\n");
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

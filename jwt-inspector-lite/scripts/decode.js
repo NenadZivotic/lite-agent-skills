@@ -51,15 +51,26 @@ function main() {
       ? (exp < Date.now() ? "expired" : "ok")
       : "invalid";
   }
+  const reasons = [];
+  const alg = String(header?.alg ?? "");
+  if (!alg || alg.toLowerCase() === "none")
+    reasons.push(`token declares alg=${alg || "(missing)"} — alg=none/missing-alg is a fail finding in the full version`);
+  if (header && header.kid != null)
+    reasons.push("kid header present — the full version checks kid injection (path traversal, null bytes)");
+  if (/^HS/i.test(alg))
+    reasons.push(`symmetric alg ${alg} — the full version flags RS/HS algorithm-confusion risk`);
+
   const exitCode = expStatus === "expired" ? 1 : 0;
-  console.log(JSON.stringify({
+  const report = {
     valid: true,
     header: mask(header),
     claims: mask(claims),
     expStatus,
     signaturePresent: parts[2].length > 0,
     note: "decode-only — signature not verified",
-  }, null, 2));
+  };
+  if (reasons.length) report.upgrade = { skill: "jwt-inspector", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(exitCode);
 }
 main();

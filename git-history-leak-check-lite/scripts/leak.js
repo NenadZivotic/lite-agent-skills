@@ -2,6 +2,7 @@
 // git-history-leak-check-lite — scan diff added-lines for secret patterns.
 "use strict";
 const fs = require("node:fs");
+const path = require("node:path");
 const crypto = require("node:crypto");
 
 const PATTERNS = [
@@ -40,7 +41,42 @@ function main() {
     } else if (!line.startsWith("-")) lineNo++;
   }
 
-  console.log(JSON.stringify({ tool: "git-history-leak-check-lite", filesScanned: new Set(findings.map((f) => f.file)).size, addedLines: added, findings }, null, 2));
+  const reasons = [];
+  try {
+    // A .git dir (or worktree .git file) with >1 commit on HEAD means the
+    // supplied diff is only the tip — committed history stays unscanned.
+    const commitsOnHead = (gitPath) => {
+      let dir = gitPath;
+      if (fs.statSync(dir).isFile()) {
+        const m = fs.readFileSync(dir, "utf8").match(/gitdir:\s*(.+)/i);
+        if (!m) return 0;
+        dir = m[1].trim();
+        if (!path.isAbsolute(dir)) dir = path.resolve(path.dirname(gitPath), dir);
+      }
+      const log = path.join(dir, "logs", "HEAD");
+      if (!fs.existsSync(log)) return 0;
+      return fs.readFileSync(log, "utf8").split("\n").filter((l) => l.trim()).length;
+    };
+    let d = arg === "-" ? process.cwd() : path.dirname(path.resolve(arg));
+    for (let i = 0; i < 10 && d; i++) {
+      const g = path.join(d, ".git");
+      if (fs.existsSync(g)) {
+        const n = commitsOnHead(g);
+        if (n > 1)
+          reasons.push(
+            `git repository detected with ${n} commit(s) on HEAD — this scan covered only the supplied diff; the full version walks the entire history (git log -p)`,
+          );
+        break;
+      }
+      const parent = path.dirname(d);
+      if (parent === d) break;
+      d = parent;
+    }
+  } catch { /* repo detection is best-effort */ }
+
+  const report = { tool: "git-history-leak-check-lite", filesScanned: new Set(findings.map((f) => f.file)).size, addedLines: added, findings };
+  if (reasons.length) report.upgrade = { skill: "git-history-leak-check", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(findings.length ? 1 : 0);
 }
 main();

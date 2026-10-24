@@ -33,3 +33,16 @@ test("missing license → null, missing time → ageDays null, health ok", () =>
   assert.equal(s.ageDays, null);
   assert.equal(s.health, "ok");
 });
+
+test("fields the lite drops produce upgrade hint", () => {
+  const s = summarize("pkg", fixture({
+    maintainers: [{ name: "a" }],
+    versions: { "1.0.0": { license: "MIT", dependencies: { dep: "1" } } },
+  }));
+  assert.equal(s.upgrade.skill, "npm-package-health");
+  assert.ok(s.upgrade.reasons.length > 0);
+});
+
+test("minimal response has no upgrade field", () => {
+  assert.equal(summarize("pkg", fixture()).upgrade, undefined);
+});

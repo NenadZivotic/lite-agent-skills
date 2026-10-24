@@ -2,4 +2,4 @@ Pick short-clip windows from a transcript (SRT/VTT/text) ranked by hook strength
 
 `node scripts/pick.js transcript.srt --clips 5`
 
-Free lite version of `video-repurpose-engine` (adds ffmpeg cuts, vertical presets, per-clip SRT). See SKILL.md for agent workflow.
+Free lite version of `video-repurpose-engine` — the full skill ($29) adds ffmpeg cuts, vertical presets, per-clip SRT. See SKILL.md for agent workflow.

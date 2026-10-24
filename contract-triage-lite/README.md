@@ -25,11 +25,9 @@ JSON flags on stdout; exit `1` when risks are found.
 
 ## Full version
 
-The paid version checks **all 10 risk categories** (adds termination
-asymmetry, perpetual confidentiality, forced arbitration/jurisdiction,
-auto-renewal lock-ins, scope-creep, warranty traps), detailed
-missing-protection analysis, a severity-ranked report format, plus
-negotiation email and redline drafting guidance:
-
-- SkillHQ: https://skillhq.dev/skills/sone94/contract-triage
-- Agensi: https://agensi.io/skills/contract-triage-nda-msa-risk-check-before-you-sign
+The full `contract-triage-nda-msa-risk-check-before-you-sign` skill ($29)
+checks **all 10 risk categories** (adds termination asymmetry, perpetual
+confidentiality, forced arbitration/jurisdiction, auto-renewal lock-ins,
+scope-creep, warranty traps), detailed missing-protection analysis, a
+severity-ranked report format, plus negotiation email and redline
+drafting guidance. Ask for it by slug.

@@ -16,7 +16,4 @@ echo '{"product":"ACME scheduler","icp":"clinic managers","painPoints":["no-show
 
 ## Full version
 
-The paid version builds the standard 4-touch cadence (days 0/3/7/14 — opener, proof bump, reframe, breakup) with proof-point and tone handling:
-
-- SkillHQ: https://skillhq.dev/skills/sone94/cold-email-sequence
-- Agensi: https://agensi.io/skills/cold-email-sequence
+The full `cold-email-sequence` skill ($6) builds the standard 4-touch cadence (days 0/3/7/14 — opener, proof bump, reframe, breakup) with proof-point and tone handling. Ask for it by slug.

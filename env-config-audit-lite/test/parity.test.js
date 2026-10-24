@@ -41,3 +41,17 @@ test("usage error exits 2", async () => {
   const { code } = await run(["only.env"]);
   assert.equal(code, 2);
 });
+
+test("duplicate keys produce upgrade hint", async () => {
+  const [a, b] = await pair("A=1\nA=2\nB=x\n", "A=\nB=\n");
+  const { stdout } = await run([a, b]);
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "env-config-audit");
+  assert.ok(r.upgrade.reasons.length > 0);
+});
+
+test("clean parity has no upgrade field", async () => {
+  const [a, b] = await pair("A=1\nB=2\n", "A=\nB=\n");
+  const { stdout } = await run([a, b]);
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

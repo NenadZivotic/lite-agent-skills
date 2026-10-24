@@ -51,3 +51,18 @@ test("usage error exits 2", async () => {
   const { code } = await run([]);
   assert.equal(code, 2);
 });
+
+test("redirect + CORS headers produce upgrade hint", async () => {
+  const { stdout } = await run(
+    ["-"],
+    "HTTP/1.1 301 Moved\nLocation: https://x.com/\nAccess-Control-Allow-Origin: *\n",
+  );
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "http-header-audit");
+  assert.ok(r.upgrade.reasons.length >= 2);
+});
+
+test("plain 200 headers have no upgrade field", async () => {
+  const { stdout } = await run(["-"], GOOD);
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

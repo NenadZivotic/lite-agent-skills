@@ -47,12 +47,30 @@ function main() {
   if (acao && acao !== "*" && !/origin/i.test(vary))
     push("missing-vary-origin", "warn", "dynamic ACAO without Vary: Origin — caches may serve the wrong origin", "add Vary: Origin");
 
-  console.log(JSON.stringify({
+  const reasons = [];
+  if (acao && acao !== "*" && acao !== "null")
+    reasons.push(
+      "ACAO echoes a specific origin — only the full version's live probes can show whether arbitrary origins are reflected",
+    );
+  const names = [...h.keys()];
+  if (names.some((k) => k === "origin" || k.startsWith("access-control-request-")))
+    reasons.push(
+      "request-side CORS headers present — preflight behaviour is only probed live by the full version",
+    );
+  if (names.some((k) => k.startsWith("access-control-expose-")))
+    reasons.push(
+      "Access-Control-Expose-Headers present — exposed-header breadth is only checked by the full version",
+    );
+
+  const report = {
     tool: "cors-misconfig-check-lite",
     acao: acao ?? null, credentials: acac,
     findings,
     ok: !findings.some((f) => f.severity === "fail"),
-  }, null, 2));
+  };
+  if (reasons.length)
+    report.upgrade = { skill: "cors-misconfig-check", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(findings.some((f) => f.severity === "fail") ? 1 : 0);
 }
 main();

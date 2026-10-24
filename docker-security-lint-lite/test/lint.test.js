@@ -48,3 +48,25 @@ test("usage error exits 2", async () => {
   const { code } = await run([]);
   assert.equal(code, 2);
 });
+
+test("compose file present produces upgrade hint", async () => {
+  const d = await fs.mkdtemp(path.join(os.tmpdir(), "dsl-up-"));
+  const f = path.join(d, "Dockerfile");
+  await fs.writeFile(f, `FROM node:20-alpine\nUSER node\n`);
+  const compose = path.join(d, "docker-compose.yml");
+  await fs.writeFile(compose, `services:\n  app:\n    image: x\n`);
+
+  const r = JSON.parse((await run([f])).stdout);
+  assert.equal(r.upgrade.skill, "docker-security-lint");
+  assert.ok(r.upgrade.reasons.length > 0);
+
+  const r2 = JSON.parse((await run([compose])).stdout);
+  assert.equal(r2.upgrade.skill, "docker-security-lint");
+  assert.ok(r2.upgrade.reasons.length > 0);
+});
+
+test("plain Dockerfile dir has no upgrade field", async () => {
+  const f = await tmp(`FROM node:20-alpine\nUSER node\n`);
+  const { stdout } = await run([f]);
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

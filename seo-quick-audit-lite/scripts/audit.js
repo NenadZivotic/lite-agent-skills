@@ -85,6 +85,21 @@ if (isMain || process.argv[1]?.endsWith("audit.js")) {
     fail: checks.filter((x) => x.status === "fail").length,
     info: checks.filter((x) => x.status === "info").length,
   };
-  console.log(JSON.stringify({ file, summary, checks }, null, 2));
+  const reasons = [];
+  if (
+    tagAttr(html, /<link[^>]+rel=["']canonical["'][^>]+href=["']https?:\/\//i) ||
+    tagAttr(html, /<meta[^>]+property=["']og:url["'][^>]+content=["']https?:\/\//i)
+  )
+    reasons.push(
+      "page references a live canonical/og:url — the full version fetches live URLs including /robots.txt and /sitemap.xml status",
+    );
+  const twitterTags = count(html, /<meta[^>]+(?:name|property)=["']twitter:/gi);
+  if (twitterTags)
+    reasons.push(
+      `${twitterTags} twitter:* meta tag(s) present — the dedicated twitter-card check is only in the full version`,
+    );
+  const report = { file, summary, checks };
+  if (reasons.length) report.upgrade = { skill: "seo-quick-audit", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(summary.fail + summary.warn ? 1 : 0);
 }

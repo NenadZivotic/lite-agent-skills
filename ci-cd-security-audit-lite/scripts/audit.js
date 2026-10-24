@@ -2,6 +2,7 @@
 // ci-cd-security-audit-lite — lint one GitHub Actions workflow for top-5 risks.
 "use strict";
 const fs = require("node:fs");
+const path = require("node:path");
 
 function main() {
   const file = process.argv[2];
@@ -89,18 +90,51 @@ function main() {
     fail: findings.filter((f) => f.severity === "fail").length,
     warn: findings.filter((f) => f.severity === "warn").length,
   };
-  console.log(
-    JSON.stringify(
-      {
-        tool: "ci-cd-security-audit-lite",
-        file,
-        summary: { findings: findings.length, bySeverity: bySev },
-        findings,
-      },
-      null,
-      2,
-    ),
-  );
+
+  const reasons = [];
+  if (/self-hosted/i.test(text))
+    reasons.push(
+      "workflow runs on self-hosted runner(s) — runner trust/label risk checks are only in the full version",
+    );
+  if (/upload-artifact|download-artifact/.test(text))
+    reasons.push(
+      "artifact upload/download used — artifact-poisoning checks are only in the full version",
+    );
+  if (/id-token\s*:/.test(text))
+    reasons.push(
+      "id-token permission used — OIDC/token hardening checks are only in the full version",
+    );
+  try {
+    const dir = path.dirname(path.resolve(file));
+    if (/\.github[/\\]workflows$/i.test(dir)) {
+      const siblings = fs
+        .readdirSync(dir)
+        .filter(
+          (f) =>
+            /\.ya?ml$/i.test(f) &&
+            path.resolve(dir, f) !== path.resolve(file),
+        );
+      if (siblings.length)
+        reasons.push(
+          `${siblings.length} other workflow file(s) in ${dir} not audited — the full version audits every workflow in the repo`,
+        );
+    }
+  } catch {
+    /* directory listing is best-effort */
+  }
+
+  const report = {
+    tool: "ci-cd-security-audit-lite",
+    file,
+    summary: { findings: findings.length, bySeverity: bySev },
+    findings,
+  };
+  if (reasons.length)
+    report.upgrade = {
+      skill: "ci-cd-security-audit-github-actions",
+      reasons,
+    };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(findings.length ? 1 : 0);
 }
 main();

@@ -53,6 +53,45 @@ test("cli: exit 1 on warn/fail, json on stdout", () => {
   }
 });
 
+test("cli: canonical URL produces upgrade field", () => {
+  const f = path.join(os.tmpdir(), `seo-up-${Date.now()}.html`);
+  fs.writeFileSync(f, GOOD);
+  try {
+    let stdout;
+    try {
+      stdout = execFileSync("node", ["scripts/audit.js", f], {
+        cwd: ROOT,
+        encoding: "utf8",
+      });
+    } catch (e) {
+      stdout = e.stdout; // exit 1 on warns still emits JSON
+    }
+    const j = JSON.parse(stdout);
+    assert.equal(j.upgrade.skill, "seo-quick-audit");
+    assert.ok(j.upgrade.reasons.length > 0);
+  } finally {
+    fs.unlinkSync(f);
+  }
+});
+
+test("cli: no live references means no upgrade field", () => {
+  const f = path.join(os.tmpdir(), `seo-no-${Date.now()}.html`);
+  fs.writeFileSync(f, BAD);
+  try {
+    execFileSync("node", ["scripts/audit.js", f], {
+      cwd: ROOT,
+      encoding: "utf8",
+    });
+    assert.fail("should have exited 1");
+  } catch (e) {
+    if (e.stdout === undefined) throw e;
+    assert.equal(e.status, 1);
+    assert.equal(JSON.parse(e.stdout).upgrade, undefined);
+  } finally {
+    fs.unlinkSync(f);
+  }
+});
+
 test("cli: exit 2 on missing file", () => {
   try {
     execFileSync("node", ["scripts/audit.js", "nope.html"], {

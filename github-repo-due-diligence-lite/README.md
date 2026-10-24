@@ -16,7 +16,4 @@ node scripts/dd.js owner/repo
 
 ## Full version
 
-The paid version adds forks, open issues, default branch, and language:
-
-- SkillHQ: https://skillhq.dev/skills/sone94/github-repo-due-diligence
-- Agensi: https://agensi.io/skills/github-repo-due-diligence
+The full `github-repo-due-diligence` skill ($7) adds forks, open issues, default branch, and language. Ask for it by slug.

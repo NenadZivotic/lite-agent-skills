@@ -44,3 +44,17 @@ test("stdin input works", async () => {
   assert.equal(code, 0);
   assert.equal(JSON.parse(stdout).valid, true);
 });
+
+test("kid header produces upgrade hint", async () => {
+  const t = b64({ alg: "RS256", kid: "key-1" }) + "." + b64({ sub: "u" }) + ".s";
+  const { stdout } = await run([t]);
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "jwt-inspector");
+  assert.ok(r.upgrade.reasons.length > 0);
+});
+
+test("plain RS256 token has no upgrade field", async () => {
+  const t = b64({ alg: "RS256", typ: "JWT" }) + "." + b64({ sub: "u" }) + ".sig";
+  const { stdout } = await run([t]);
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

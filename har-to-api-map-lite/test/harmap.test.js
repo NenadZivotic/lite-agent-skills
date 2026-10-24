@@ -41,3 +41,44 @@ test("missing arg exits 2", async () => {
   const { code } = await run([]);
   assert.equal(code, 2);
 });
+
+test("non-GET/query/auth evidence produces upgrade hint", async () => {
+  const har2 = {
+    log: {
+      entries: [
+        {
+          request: {
+            method: "POST",
+            url: "https://api.x.com/login?next=/",
+            postData: { text: "{}" },
+            headers: [{ name: "authorization", value: "x" }],
+          },
+          response: { status: 200, content: { mimeType: "application/json" } },
+        },
+      ],
+    },
+  };
+  const f = path.join(await fs.mkdtemp(path.join(os.tmpdir(), "har-up-")), "cap.har");
+  await fs.writeFile(f, JSON.stringify(har2));
+  const { stdout } = await run([f]);
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "har-to-api-map");
+  assert.ok(r.upgrade.reasons.length >= 3);
+});
+
+test("plain GET inventory has no upgrade field", async () => {
+  const har3 = {
+    log: {
+      entries: [
+        {
+          request: { method: "GET", url: "https://api.x.com/items" },
+          response: { status: 200, content: { mimeType: "application/json" } },
+        },
+      ],
+    },
+  };
+  const f = path.join(await fs.mkdtemp(path.join(os.tmpdir(), "har-cl-")), "cap.har");
+  await fs.writeFile(f, JSON.stringify(har3));
+  const { stdout } = await run([f]);
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

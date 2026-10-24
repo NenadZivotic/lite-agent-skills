@@ -227,6 +227,28 @@ export function summarize(checks) {
   return summary;
 }
 
+// Evidence in the supplied files that only the full version's live fetches
+// would resolve. Returns [] when nothing applies.
+export function upgradeReasons({ html = null, robots = null, llms = null } = {}) {
+  const reasons = [];
+  if (html && /<link[^>]+rel=["']canonical["'][^>]+href=["']https?:\/\//i.test(html))
+    reasons.push(
+      "page declares an absolute canonical URL — the full version fetches live URLs to confirm what AI crawlers actually receive",
+    );
+  if (robots && /^sitemap\s*:/im.test(robots))
+    reasons.push(
+      "robots.txt declares a Sitemap URL — the full version fetches and validates it live",
+    );
+  if (llms) {
+    const links = (llms.match(/\]\(https?:\/\//g) ?? []).length;
+    if (links)
+      reasons.push(
+        `llms.txt lists ${links} outbound link(s) — the full version validates them live`,
+      );
+  }
+  return reasons;
+}
+
 const isMain =
   process.argv[1] &&
   (import.meta.url ===
@@ -254,6 +276,9 @@ if (isMain) {
   }
   const checks = audit(input);
   const summary = summarize(checks);
-  console.log(JSON.stringify({ summary, checks }, null, 2));
+  const report = { summary, checks };
+  const reasons = upgradeReasons(input);
+  if (reasons.length) report.upgrade = { skill: "geo-audit", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(summary.warn + summary.fail > 0 ? 1 : 0);
 }

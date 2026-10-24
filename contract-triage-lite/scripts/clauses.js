@@ -69,6 +69,17 @@ const TAXONOMY = [
   },
 ];
 
+// Categories only the full version scores — used for the evidence-based
+// upgrade hint when this contract actually contains such clauses.
+const FULL_ONLY = [
+  ["termination", /terminat/i],
+  ["confidentiality", /confidential|non[- ]?disclosure/i],
+  ["jurisdiction", /governing law|jurisdiction|venue|courts? (?:of|in)/i],
+  ["auto-renewal", /auto[- ]?renew|renews? automatically|evergreen/i],
+  ["scope-creep", /scope of work|out[- ]of[- ]scope|change orders?|additional (?:work|services)/i],
+  ["warranty", /warrant/i],
+];
+
 function analyze(text) {
   const clauses = segment(text);
   const flags = [];
@@ -105,7 +116,7 @@ function analyze(text) {
   const order = { high: 0, medium: 1, low: 2 };
   flags.sort((a, b) => order[a.severity] - order[b.severity]);
 
-  return {
+  const report = {
     tool: "contract-triage-lite",
     note: "lite version checks 4 of 10 risk categories — full version adds termination, confidentiality, jurisdiction, auto-renewal, scope-creep, warranty + missing-protection detail",
     clauses: clauses.length,
@@ -118,6 +129,16 @@ function analyze(text) {
     flags,
     missing,
   };
+
+  const uncovered = FULL_ONLY.filter(([, re]) => re.test(text)).map(([id]) => id);
+  if (uncovered.length)
+    report.upgrade = {
+      skill: "contract-triage-nda-msa-risk-check-before-you-sign",
+      reasons: [
+        `contract contains ${uncovered.join(", ")} language — outside the lite's 4 scored categories; the full version scores all 10`,
+      ],
+    };
+  return report;
 }
 
 if (process.argv[1]?.endsWith("clauses.js")) {

@@ -35,12 +35,19 @@ function main() {
   }
 
   const by = (k) => links.filter((l) => l.kind === k).length;
-  console.log(JSON.stringify({
+  const reasons = [];
+  if (by("internal") || by("external"))
+    reasons.push(
+      `${by("internal") + by("external")} resolvable link(s) found (${by("internal")} internal, ${by("external")} external) — this lite only classifies hrefs; live HTTP status, redirect chains and timeouts are checked by the full version`,
+    );
+  const report = {
     file,
     summary: { total: links.length, internal: by("internal"), external: by("external"), anchor: by("anchor"), mailto: by("mailto"), tel: by("tel"), javascript: by("javascript"), flagged: flagged.length },
     unresolvedAnchors: flagged.filter((l) => l.kind === "anchor").map((l) => l.href),
     flaggedLinks: flagged,
-  }, null, 2));
+  };
+  if (reasons.length) report.upgrade = { skill: "broken-link-crawl", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(flagged.length ? 1 : 0);
 }
 main();

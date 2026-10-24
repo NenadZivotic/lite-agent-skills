@@ -19,7 +19,7 @@ function get(url) {
 
 export function summarize(owner, repo, d) {
   const pushDays = Math.round((Date.now() - new Date(d.pushed_at)) / 86400000);
-  return {
+  const out = {
     repo: `${owner}/${repo}`,
     stars: d.stargazers_count,
     lastPushDaysAgo: pushDays,
@@ -27,6 +27,20 @@ export function summarize(owner, repo, d) {
     archived: d.archived,
     health: d.archived ? "archived" : pushDays > 365 ? "stale (>1y)" : pushDays > 180 ? "quiet" : "active",
   };
+  const dropped = [
+    d.forks_count != null && "forks",
+    d.open_issues_count != null && "open issues",
+    d.default_branch && "default branch",
+    d.language && "primary language",
+  ].filter(Boolean);
+  if (dropped.length)
+    out.upgrade = {
+      skill: "github-repo-due-diligence",
+      reasons: [
+        `the API response already contained ${dropped.join(", ")} for ${owner}/${repo} — the full version reports them in the same single request`,
+      ],
+    };
+  return out;
 }
 
 if (process.argv[1]?.endsWith("dd.js")) {

@@ -46,3 +46,27 @@ jobs:
   assert.equal(r.findings.filter((f) => f.id === "unpinned-action").length, 0);
   assert.ok(r.findings.some((f) => f.id === "pull-request-target"));
 });
+
+test("self-hosted runner produces upgrade hint", async () => {
+  const { stdout } = await run(`on: push
+jobs:
+  x:
+    runs-on: self-hosted
+    steps:
+      - run: echo hi
+`);
+  const r = JSON.parse(stdout);
+  assert.equal(r.upgrade.skill, "ci-cd-security-audit-github-actions");
+  assert.ok(r.upgrade.reasons.length > 0);
+});
+
+test("plain workflow has no upgrade field", async () => {
+  const { stdout } = await run(`on: push
+jobs:
+  x:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo hi
+`);
+  assert.equal(JSON.parse(stdout).upgrade, undefined);
+});

@@ -2,7 +2,10 @@
 // docker-security-lint-lite — lint Dockerfiles for the top-5 security rules.
 "use strict";
 const fs = require("node:fs");
+const path = require("node:path");
 const crypto = require("node:crypto");
+
+const COMPOSE_NAME = /(?:docker-?)?compose[^/\\]*\.ya?ml$/i;
 
 const SECRET_NAME = /(secret|token|key|password|passwd|pwd|api[-_]?key|credential|private)/i;
 
@@ -47,16 +50,40 @@ function lintFile(file) {
   return findings;
 }
 
+const looksCompose = (file) => {
+  if (COMPOSE_NAME.test(file)) return true;
+  if (!/\.ya?ml$/i.test(file)) return false;
+  try { return /^\s*services\s*:/m.test(fs.readFileSync(file, "utf8")); }
+  catch { return false; }
+};
+
 function main() {
   const files = process.argv.slice(2);
   if (!files.length) { console.error("usage: node lint.js <Dockerfile> [...]"); process.exit(2); }
-  const all = [], notes = [];
+  const all = [], notes = [], reasons = [];
+  const dirsChecked = new Set();
   for (const f of files) {
+    if (looksCompose(f)) {
+      notes.push(`${f}: docker-compose file — lite checks Dockerfile rules only`);
+      reasons.push(`${path.basename(f)} is a compose file — the full version lints compose services (privileged, host network, 0.0.0.0 ports, docker.sock mounts, capabilities, env secrets)`);
+      continue;
+    }
     try { all.push(...lintFile(f)); }
     catch (e) { notes.push(`${f}: ${e.message}`); }
+    const dir = path.dirname(path.resolve(f));
+    if (!dirsChecked.has(dir)) {
+      dirsChecked.add(dir);
+      try {
+        const siblings = fs.readdirSync(dir).filter((s) => COMPOSE_NAME.test(s));
+        if (siblings.length)
+          reasons.push(`compose file(s) alongside ${path.basename(f)}: ${siblings.join(", ")} — the full version lints compose stacks (privileged, host network, docker.sock mounts)`);
+      } catch { /* directory listing is best-effort */ }
+    }
   }
   const bySeverity = { fail: all.filter((f) => f.severity === "fail").length, warn: all.filter((f) => f.severity === "warn").length };
-  console.log(JSON.stringify({ tool: "docker-security-lint-lite", summary: { filesScanned: files.length - notes.length, findings: all.length, bySeverity }, findings: all, notes }, null, 2));
+  const report = { tool: "docker-security-lint-lite", summary: { filesScanned: files.length - notes.length, findings: all.length, bySeverity }, findings: all, notes };
+  if (reasons.length) report.upgrade = { skill: "docker-security-lint", reasons };
+  console.log(JSON.stringify(report, null, 2));
   process.exit(all.length ? 1 : 0);
 }
 main();

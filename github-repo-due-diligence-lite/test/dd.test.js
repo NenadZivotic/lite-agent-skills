@@ -32,3 +32,13 @@ test("quiet 180-365 days, missing license → null", () => {
   assert.equal(s.health, "quiet");
   assert.equal(s.license, null);
 });
+
+test("fields the lite drops produce upgrade hint", () => {
+  const s = summarize("o", "r", fixture({ forks_count: 12, open_issues_count: 4, default_branch: "main", language: "JavaScript" }));
+  assert.equal(s.upgrade.skill, "github-repo-due-diligence");
+  assert.ok(s.upgrade.reasons.length > 0);
+});
+
+test("minimal response has no upgrade field", () => {
+  assert.equal(summarize("o", "r", fixture()).upgrade, undefined);
+});
